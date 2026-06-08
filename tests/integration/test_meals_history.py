@@ -102,7 +102,8 @@ async def test_process_meal_delete(db_session, mock_state, mock_db_user):
     
     db_user = await crud.get_user(db_session, 12345)
     
-    mock_state.get_data.return_value = {"view_date": "2026-06-07"}
+    today_str = datetime.now(UTC).strftime("%Y-%m-%d")
+    mock_state.get_data.return_value = {"view_date": today_str}
     
     message = make_mock_message("❌ Delete #1")
     
@@ -141,7 +142,8 @@ async def test_start_meal_edit(db_session, mock_state, mock_db_user):
     
     db_user = await crud.get_user(db_session, 12345)
     
-    mock_state.get_data.return_value = {"view_date": "2026-06-07"}
+    today_str = datetime.now(UTC).strftime("%Y-%m-%d")
+    mock_state.get_data.return_value = {"view_date": today_str}
     
     message = make_mock_message("✏️ Edit #1")
     
@@ -153,9 +155,10 @@ async def test_start_meal_edit(db_session, mock_state, mock_db_user):
     assert "editing the meal" in message.answer.call_args[0][0]
 
 async def test_process_meal_edit_text(mock_state, mock_gemini_client):
+    today_str = datetime.now(UTC).strftime("%Y-%m-%d")
     mock_state.get_data.return_value = {
         "edit_meal_id": 99,
-        "edit_date_str": "2026-06-07",
+        "edit_date_str": today_str,
         "original_data": {
             "food_items": [{"name": "Egg", "portion": "1 egg", "calories": 70, "protein": 6, "fat": 5, "carb": 0.5}],
             "total_calories": 70, "total_protein": 6, "total_fat": 5, "total_carb": 0.5
@@ -206,9 +209,10 @@ async def test_accept_meal_edit(db_session, mock_state, mock_db_user):
     
     db_user = await crud.get_user(db_session, 12345)
     
+    today_str = datetime.now(UTC).strftime("%Y-%m-%d")
     mock_state.get_data.return_value = {
         "edit_meal_id": meal.id,
-        "edit_date_str": "2026-06-07",
+        "edit_date_str": today_str,
         "adjusted_analysis": {
             "food_items": [{"name": "Egg", "portion": "2 eggs", "calories": 140, "protein": 12, "fat": 10, "carb": 1.0}],
             "total_calories": 140, "total_protein": 12.0, "total_fat": 10.0, "total_carb": 1.0
@@ -228,9 +232,10 @@ async def test_accept_meal_edit(db_session, mock_state, mock_db_user):
     assert "updated successfully" in message.answer.call_args_list[0][0][0]
 
 async def test_cancel_meal_edit(mock_state, mock_db_user):
+    today_str = datetime.now(UTC).strftime("%Y-%m-%d")
     mock_state.get_data.return_value = {
         "edit_meal_id": 12,
-        "edit_date_str": "2026-06-07"
+        "edit_date_str": today_str
     }
     message = make_mock_message("❌ Cancel")
     

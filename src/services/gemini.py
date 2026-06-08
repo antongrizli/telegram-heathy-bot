@@ -40,7 +40,7 @@ client = genai.Client(api_key=settings.GEMINI_API_KEY)
 async def call_gemini_with_retry(
     contents,
     config=None,
-    model="gemini-2.5-flash",
+    model: Optional[str] = None,
     max_retries=4,
     initial_delay=0.1,
     backoff_factor=2.0
@@ -49,6 +49,8 @@ async def call_gemini_with_retry(
     Calls Gemini generate_content in a non-blocking thread,
     retrying with exponential backoff on transient errors (like 503 UNAVAILABLE or 429).
     """
+    if model is None:
+        model = settings.GEMINI_MODEL
     delay = initial_delay
     for attempt in range(max_retries):
         try:
